@@ -9,3 +9,5 @@ set(SOURCES src/main.cpp
 			src/Timer.h)
 
 add_executable(main ${SOURCES})
+
+target_link_libraries(main -lpthread)

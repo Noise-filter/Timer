@@ -8,18 +8,18 @@
 template <class DURATION_TYPE = std::chrono::nanoseconds>
 class Timer {
 public:
-	constexpr Timer(std::string_view name = "Timer") noexcept : name_(name), start_(std::chrono::high_resolution_clock::now()) {}
+	Timer(const std::string_view name = "Timer", std::ostream& out = std::cout) noexcept
+		: out_(out), name_(name), start_(std::chrono::high_resolution_clock::now()) {}
 
-	constexpr void printTime() const noexcept {
-		std::cout << *this << std::endl;
+	void printTime() const noexcept {
+		out_ << *this << '\n';
 	}
 
-	constexpr int64_t getTime() const noexcept {
+	int64_t getTime() const noexcept {
 		return std::chrono::duration_cast<DURATION_TYPE>(std::chrono::high_resolution_clock::now() - start_).count();
 	}
 
-	template <class FRIEND_DURATION_TYPE>
-	friend std::ostream& operator<<(std::ostream& out, const Timer<FRIEND_DURATION_TYPE>& timer) noexcept;
+	std::string_view getName() const noexcept { return name_; }
 
 	constexpr const char* getPostfix() const noexcept {
 		if constexpr (std::is_same<DURATION_TYPE, std::chrono::nanoseconds>::value) {
@@ -37,11 +37,13 @@ public:
 		}
 	}
 
-	const std::string_view& getName() const noexcept { return name_; }
+	template <class FRIEND_DURATION_TYPE>
+	friend std::ostream& operator<<(std::ostream& out, const Timer<FRIEND_DURATION_TYPE>& timer) noexcept;
 
 private:
-	std::string_view name_;
-	std::chrono::high_resolution_clock::time_point start_;
+	const std::string_view name_;
+	const std::chrono::high_resolution_clock::time_point start_;
+	std::ostream& out_;
 
 };
 
@@ -51,5 +53,16 @@ std::ostream& operator<<(std::ostream& out, const Timer<DURATION_TYPE>& timer) n
 	out << timer.getName() << ": " << time << timer.getPostfix();
 	return out;
 }
+
+template <class DURATION_TYPE = std::chrono::nanoseconds>
+class ScopedTimer : public Timer<DURATION_TYPE> {
+public:
+	ScopedTimer(std::string_view name = "Timer", std::ostream& out = std::cout) noexcept 
+		: Timer<DURATION_TYPE>(name, out) {}
+
+	~ScopedTimer() {
+		this->printTime();
+	}
+};
 
 #endif
