@@ -9,7 +9,7 @@ template <class DURATION_TYPE = std::chrono::nanoseconds>
 class Timer {
 public:
 	Timer(const std::string_view name = "Timer", std::ostream& out = std::cout) noexcept
-		: out_(out), name_(name), start_(std::chrono::high_resolution_clock::now()) {}
+		: name_(name), start_(std::chrono::high_resolution_clock::now()), out_(out) {}
 
 	void printTime() const noexcept {
 		out_ << *this << '\n';
@@ -60,7 +60,7 @@ public:
 	ScopedTimer(std::string_view name = "Timer", std::ostream& out = std::cout) noexcept 
 		: Timer<DURATION_TYPE>(name, out) {}
 
-	~ScopedTimer() {
+	~ScopedTimer() noexcept {
 		this->printTime();
 	}
 };
