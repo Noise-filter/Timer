@@ -9,14 +9,14 @@ template <class DURATION_TYPE = std::chrono::nanoseconds>
 class Timer {
 public:
 	Timer(const std::string_view name = "Timer", std::ostream& out = std::cout) noexcept
-		: name_(name), start_(std::chrono::high_resolution_clock::now()), out_(out) {}
+		: name_(name), start_(std::chrono::steady_clock::now()), out_(out) {}
 
 	void printTime() const noexcept {
 		out_ << *this << '\n';
 	}
 
 	int64_t getTime() const noexcept {
-		return std::chrono::duration_cast<DURATION_TYPE>(std::chrono::high_resolution_clock::now() - start_).count();
+		return std::chrono::duration_cast<DURATION_TYPE>(std::chrono::steady_clock::now() - start_).count();
 	}
 
 	std::string_view getName() const noexcept { return name_; }
@@ -42,7 +42,7 @@ public:
 
 private:
 	const std::string_view name_;
-	const std::chrono::high_resolution_clock::time_point start_;
+	const std::chrono::steady_clock::time_point start_;
 	std::ostream& out_;
 
 };
